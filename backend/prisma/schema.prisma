@@ -1,0 +1,494 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  SOC_TIER_1
+  SOC_TIER_2
+  SOC_TIER_3
+  SOC_TIER_4
+  SOC_TIER_5
+  AUDITOR_1
+  AUDITOR_2
+  AUDITOR_3
+  IT
+  ANALYST
+  VIEWER
+}
+
+enum EndpointStatus {
+  ONLINE
+  OFFLINE
+  ISOLATED
+  COMPROMISED
+}
+
+enum AgentStatus {
+  HEALTHY
+  UPDATING
+  ERROR
+  STOPPED
+  UNINSTALLED
+}
+
+enum AlertStatus {
+  NEW
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+}
+
+enum ThreatStatus {
+  ACTIVE
+  INVESTIGATING
+  CONTAINED
+  RESOLVED
+  FALSE_POSITIVE
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum USBDeviceStatus {
+  PENDING
+  APPROVED
+  BLOCKED
+  QUARANTINED
+}
+
+enum IntegrationStatus {
+  DISCONNECTED
+  CONNECTED
+  ERROR
+  SYNCING
+}
+
+// ─── User & Auth ─────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ANALYST)
+
+  // MFA
+  mfaSecret   String?
+  mfaEnabled  Boolean  @default(false)
+  mfaVerified Boolean  @default(false)
+
+  // Password reset
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs         AuditLog[]
+  sessions          Session[]
+  copilotMessages   CopilotMessage[]
+  assignedAlerts    Alert[]      @relation("AssignedAlerts")
+  createdAlerts     Alert[]      @relation("CreatedAlerts")
+  assignedThreats   Threat[]     @relation("AssignedThreats")
+  createdThreats    Threat[]     @relation("CreatedThreats")
+
+  @@index([role])
+  @@index([email])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  type         String   @default("refresh") // refresh, mfa, password_reset
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// ─── Departments & Tags ──────────────────────────────────────────────────────
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  endpoints   EndpointDepartment[]
+
+  @@index([name])
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  endpoints   EndpointTag[]
+
+  @@index([name])
+}
+
+// ─── Endpoint ────────────────────────────────────────────────────────────────
+
+model Endpoint {
+  id            String         @id @default(cuid())
+  hostname      String
+  ipAddress     String
+  os            String
+  osVersion     String
+  manufacturer  String
+  model         String
+  cpu           String
+  ram           Int
+  diskTotal     String         // BigInt stored as String for JSON serialization
+  diskUsed      String         // BigInt stored as String for JSON serialization
+  status        EndpointStatus @default(ONLINE)
+  agentVersion  String
+  agentStatus   AgentStatus    @default(HEALTHY)
+  riskScore     Int            @default(0)
+  user          String
+  domain        String
+  location      String
+  macAddress    String
+  publicKey     String?
+  registrationToken String?
+  lastHeartbeat    DateTime?
+
+  lastSeen      DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  threats              Threat[]
+  events               TimelineEvent[]
+  alerts               Alert[]
+  firewallRules        FirewallRule[]
+  usbDevices           USBDevice[]
+  vulnerabilities      VulnerabilityEndpoint[]
+  departments          EndpointDepartment[]
+  tags                 EndpointTag[]
+
+  @@index([hostname])
+  @@index([ipAddress])
+  @@index([macAddress])
+  @@index([status])
+  @@index([agentStatus])
+  @@index([riskScore])
+  @@index([lastSeen])
+  @@index([registrationToken])
+}
+
+model EndpointDepartment {
+  id           String     @id @default(cuid())
+  endpointId   String
+  departmentId String
+  endpoint     Endpoint   @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([endpointId, departmentId])
+  @@index([endpointId])
+  @@index([departmentId])
+}
+
+model EndpointTag {
+  id         String   @id @default(cuid())
+  endpointId String
+  tagId      String
+  endpoint   Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([endpointId, tagId])
+  @@index([endpointId])
+  @@index([tagId])
+}
+
+// ─── Threats ─────────────────────────────────────────────────────────────────
+
+model Threat {
+  id                String       @id @default(cuid())
+  name              String
+  type              String
+  severity          Severity
+  status            ThreatStatus @default(ACTIVE)
+  description       String
+  endpointId        String
+  endpoint          Endpoint     @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  mitreTactics      Json?        // string[]
+  mitreTechniques   Json?        // string[]
+  iocs              Json?        // { type, value, confidence }[]
+  processTree       Json?        // { pid, name, path, parent }[]
+  recommendedActions Json?       // string[]
+
+  affectedFiles     String?
+  ioc               String?
+  autoRemediated    Boolean      @default(false)
+  detectedAt        DateTime     @default(now())
+  resolvedAt        DateTime?
+
+  // Relations
+  assignedToId      String?
+  assignedTo        User?        @relation("AssignedThreats", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdById       String?
+  createdBy         User?        @relation("CreatedThreats", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([severity])
+  @@index([status])
+  @@index([endpointId])
+  @@index([assignedToId])
+  @@index([detectedAt])
+}
+
+// ─── Alerts ──────────────────────────────────────────────────────────────────
+
+model Alert {
+  id           String      @id @default(cuid())
+  title        String
+  severity     Severity
+  source       String
+  description  String
+  status       AlertStatus @default(NEW)
+  endpointId   String?
+  endpoint     Endpoint?   @relation(fields: [endpointId], references: [id], onDelete: SetNull)
+
+  assignedToId String?
+  assignedTo   User?       @relation("AssignedAlerts", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdById  String?
+  createdBy    User?       @relation("CreatedAlerts", fields: [createdById], references: [id], onDelete: SetNull)
+
+  details      Json?       // arbitrary details object
+  tags         Json?       // string[]
+
+  timestamp      DateTime  @default(now())
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([severity])
+  @@index([status])
+  @@index([endpointId])
+  @@index([assignedToId])
+  @@index([timestamp])
+}
+
+// ─── Timeline ────────────────────────────────────────────────────────────────
+
+model TimelineEvent {
+  id          String   @id @default(cuid())
+  endpointId  String
+  endpoint    Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  category    String
+  title       String
+  description String
+  details     Json?
+  severity    Severity
+  timestamp   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([endpointId])
+  @@index([category])
+  @@index([severity])
+  @@index([timestamp])
+}
+
+// ─── Vulnerabilities ─────────────────────────────────────────────────────────
+
+model Vulnerability {
+  id              String   @id @default(cuid())
+  cveId           String   @unique
+  software        String
+  version         String
+  severity        Severity
+  cvssScore       Float
+  description     String
+  exploitedInTheWild Boolean @default(false)
+  patchAvailable  Boolean  @default(false)
+  publishDate     DateTime
+  references      Json?    // string[]
+  details         Json?    // arbitrary CVSS breakdown, etc.
+
+  endpoints       VulnerabilityEndpoint[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([cveId])
+  @@index([severity])
+  @@index([cvssScore])
+  @@index([publishDate])
+}
+
+model VulnerabilityEndpoint {
+  id              String       @id @default(cuid())
+  vulnerabilityId String
+  endpointId      String
+  vulnerability   Vulnerability @relation(fields: [vulnerabilityId], references: [id], onDelete: Cascade)
+  endpoint        Endpoint     @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  status          String       @default("open") // open, patched, accepted, mitigated
+  detectedAt      DateTime     @default(now())
+  patchedAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([vulnerabilityId, endpointId])
+  @@index([vulnerabilityId])
+  @@index([endpointId])
+  @@index([status])
+}
+
+// ─── Firewall ────────────────────────────────────────────────────────────────
+
+model FirewallRule {
+  id            String   @id @default(cuid())
+  name          String
+  action        String   // allow, deny, log
+  direction     String   // inbound, outbound
+  protocol      String   // tcp, udp, icmp, any
+  localPort     String?
+  remoteAddress String?
+  remotePort    String?
+  enabled       Boolean  @default(true)
+  endpointId    String
+  endpoint      Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([endpointId])
+  @@index([action])
+  @@index([enabled])
+}
+
+// ─── USB Devices ─────────────────────────────────────────────────────────────
+
+model USBDevice {
+  id           String         @id @default(cuid())
+  vendorId     String
+  productId    String
+  deviceName   String
+  serialNumber String
+  endpointId   String
+  endpoint     Endpoint       @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  deviceType   String
+  status       USBDeviceStatus @default(PENDING)
+  firstSeen    DateTime       @default(now())
+  lastSeen     DateTime       @default(now())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([endpointId])
+  @@index([status])
+  @@index([vendorId])
+  @@index([serialNumber])
+}
+
+// ─── Audit Log ───────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  target    String
+  details   Json?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([action])
+  @@index([target])
+  @@index([timestamp])
+}
+
+// ─── Settings ────────────────────────────────────────────────────────────────
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  group     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([group])
+  @@index([key])
+}
+
+// ─── Integrations ────────────────────────────────────────────────────────────
+
+model Integration {
+  id          String            @id @default(cuid())
+  name        String
+  category    String
+  status      IntegrationStatus @default(DISCONNECTED)
+  config      Json?
+  lastSync    DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([category])
+  @@index([status])
+}
+
+// ─── Copilot (AI Assistant) ─────────────────────────────────────────────────
+
+model CopilotMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   // user, assistant, system
+  content   String
+  metadata  Json?    // tokens used, model, latency, etc.
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ─── Widgets ─────────────────────────────────────────────────────────────────
+
+model Widget {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  config      Json?
+  position    Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([position])
+}
