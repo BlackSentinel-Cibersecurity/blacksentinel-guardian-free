@@ -19,9 +19,9 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: cd blacksentinel-guardian && npm ci
-      - run: cd blacksentinel-guardian && npm run typecheck
-      - run: cd blacksentinel-guardian && npm run build
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
 
   build-frontend:
     needs: test
