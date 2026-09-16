@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   api:
+    image: ghcr.io/blacksentinel-cibersecurity/blacksentinel-guardian-free-backend:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -45,6 +46,7 @@ services:
     restart: unless-stopped
 
   frontend:
+    image: ghcr.io/blacksentinel-cibersecurity/blacksentinel-guardian-free-frontend:latest
     build:
       context: ../
       dockerfile: Dockerfile.frontend
