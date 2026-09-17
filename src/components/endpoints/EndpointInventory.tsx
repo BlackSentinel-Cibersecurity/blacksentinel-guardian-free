@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Monitor, Search, Filter, MoreVertical, Shield, Cpu, HardDrive, MemoryStick, Wifi, WifiOff, ArrowUpDown, ChevronDown, ExternalLink, Terminal, Plus } from 'lucide-react'
-import { cn, formatNumber, formatBytes, getStatusColor } from '@/utils/helpers'
+import { Monitor, Search, MoreVertical, Shield, Cpu, HardDrive, MemoryStick, Wifi, WifiOff, Terminal, Plus } from 'lucide-react'
+import { cn, formatBytes, getStatusColor } from '@/utils/helpers'
 import { useEndpoints } from '@/hooks'
 import type { Endpoint, OS } from '@/types'
 import AddEndpointModal from './AddEndpointModal'
 
 export default function EndpointInventory() {
-  const { endpoints, loading, refresh } = useEndpoints()
+  const { endpoints, refresh } = useEndpoints()
   const [searchQuery, setSearchQuery] = useState('')
   const [osFilter, setOsFilter] = useState<OS | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | null>(null)
-  const [sortField, setSortField] = useState<string>('riskScore')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [sortField] = useState<string>('riskScore')
+  const [sortDir] = useState<'asc' | 'desc'>('desc')
   const [showAddModal, setShowAddModal] = useState(false)
 
   const filteredEndpoints = endpoints.filter(ep => {

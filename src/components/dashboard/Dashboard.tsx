@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Monitor, Shield, AlertTriangle, Bug, Lock, Brain, Activity,
-  TrendingUp, TrendingDown, Server, Users, Wifi, WifiOff,
+  Monitor, Shield, AlertTriangle, Bug, Lock, Brain,
   Zap, Eye, ShieldAlert, Clock, ArrowUpRight, ArrowDownRight,
-  ChevronRight, MoreVertical, RefreshCw, Target
+  RefreshCw
 } from 'lucide-react'
-import { cn, formatNumber } from '@/utils/helpers'
+import { cn } from '@/utils/helpers'
 import { api } from '@/services/api'
 import { useEndpoints, useThreats, useAlerts } from '@/hooks'
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'

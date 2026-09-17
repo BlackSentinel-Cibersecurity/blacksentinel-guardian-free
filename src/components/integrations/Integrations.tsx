@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Link, ExternalLink, CheckCircle, AlertCircle, Settings, RefreshCw, Plus, Cloud, Database, MessageSquare, Code } from 'lucide-react'
+import { CheckCircle, AlertCircle, RefreshCw, Plus } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { api } from '@/services/api'
 import type { Integration } from '@/types'
 
 export default function Integrations() {
   const [integrations, setIntegrations] = useState<Integration[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     api.integrations.list()

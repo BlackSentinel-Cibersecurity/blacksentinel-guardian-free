@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ShieldAlert, AlertTriangle, ExternalLink, Server, TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { ShieldAlert, AlertTriangle, Server, CheckCircle } from 'lucide-react'
 import { cn, getSeverityBadge } from '@/utils/helpers'
 import { useVulnerabilities } from '@/hooks'
 

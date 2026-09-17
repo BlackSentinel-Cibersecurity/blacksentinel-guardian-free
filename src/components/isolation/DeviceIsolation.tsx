@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion'
-import { Lock, Unlock, Shield, AlertTriangle, CheckCircle, Wifi, WifiOff, Clock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { useEndpoints } from '@/hooks'
 

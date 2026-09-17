@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, CheckCircle, AlertTriangle, AlertCircle, Info, Bell } from 'lucide-react'
+import { X, CheckCircle, AlertTriangle, AlertCircle, Info } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 
 interface Toast {

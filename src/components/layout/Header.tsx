@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Bell, Shield, ChevronDown, Settings, User, LogOut, X, AlertTriangle } from 'lucide-react'
+import { Search, Bell, ChevronDown, Settings, User, LogOut, X } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { useAlerts } from '@/hooks'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -11,7 +11,6 @@ import RoleBadge from '@/components/ui/RoleBadge'
 export default function Header() {
   const { alerts } = useAlerts()
   const { userRole } = usePermissions()
-  const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)

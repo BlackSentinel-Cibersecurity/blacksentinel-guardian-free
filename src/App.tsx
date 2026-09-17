@@ -34,7 +34,7 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
   const { toasts, addToast, dismissToast } = useToast()
-  const { dialog, confirm, closeDialog } = useConfirmDialog()
+  const { dialog, closeDialog } = useConfirmDialog()
   const { realtimeAlerts, clearAlerts } = useRealTimeAlerts()
   const {
     bootstrapMode,

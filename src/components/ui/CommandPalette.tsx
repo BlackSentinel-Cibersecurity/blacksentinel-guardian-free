@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LayoutDashboard, Monitor, Clock, Bug, Brain, Swords, ShieldAlert, Usb, Network, Lock, Code, Settings, Link, X, Command } from 'lucide-react'
+import { LayoutDashboard, Monitor, Clock, Bug, Brain, Swords, ShieldAlert, Usb, Network, Lock, Code, Settings, Link, Command } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 
 interface CommandPaletteProps {
@@ -28,23 +28,30 @@ const commands = [
 export function CommandPalette({ isOpen, onClose, onNavigate }: CommandPaletteProps) {
   const [query, setQuery] = useState('')
   const [selectedIdx, setSelectedIdx] = useState(0)
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  const [prevQuery, setPrevQuery] = useState(query)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const filtered = commands.filter(cmd =>
     cmd.label.toLowerCase().includes(query.toLowerCase())
   )
 
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen)
     if (isOpen) {
       setQuery('')
       setSelectedIdx(0)
+    }
+  } else if (query !== prevQuery) {
+    setPrevQuery(query)
+    setSelectedIdx(0)
+  }
+
+  useEffect(() => {
+    if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }, [isOpen])
-
-  useEffect(() => {
-    setSelectedIdx(0)
-  }, [query])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Clock, Filter, Search, ChevronRight, AlertTriangle, Shield, Cpu, Wifi, File, Key, Usb, Users, Settings, Bug } from 'lucide-react'
+import { Search, ChevronRight, AlertTriangle, Shield, Cpu, Wifi, File, Key, Usb, Users, Settings } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { useTimeline, useEndpoints } from '@/hooks'
-import type { TimelineEvent } from '@/types'
 
 const categoryIcons: Record<string, React.ElementType> = {
   threat: AlertTriangle, process: Cpu, network: Wifi, file: File, registry: Settings, usb: Usb, auth: Key, policy: Shield, software: Users, user: Users,
@@ -16,7 +15,7 @@ const categoryColors: Record<string, string> = {
 }
 
 export default function DeviceTimeline() {
-  const { events: timelineEvents, loading } = useTimeline()
+  const { events: timelineEvents } = useTimeline()
   const { endpoints } = useEndpoints()
   const [selectedEndpoint, setSelectedEndpoint] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
