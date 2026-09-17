@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { AlertTriangle, AlertCircle, Info, X } from 'lucide-react'
+import { AlertTriangle, AlertCircle, Info } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 
 interface ConfirmDialogProps {

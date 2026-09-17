@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Code, Shield, ShieldOff, AlertTriangle, Play, Pause, Settings, Terminal, FileCode } from 'lucide-react'
+import { Code, Shield, ShieldOff, Settings, Terminal, FileCode } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { api } from '@/services/api'
 
@@ -26,7 +25,7 @@ interface RecentBlock {
 export default function ScriptControl() {
   const [scriptRules, setScriptRules] = useState<ScriptRule[]>([])
   const [recentBlocks, setRecentBlocks] = useState<RecentBlock[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {

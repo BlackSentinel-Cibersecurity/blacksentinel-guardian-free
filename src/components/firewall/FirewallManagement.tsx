@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Network, Shield, ShieldOff, Plus, Trash2, Edit, ToggleLeft, ToggleRight, Globe, Lock } from 'lucide-react'
+import { Network, Shield, ShieldOff, Plus, Trash2, Edit, ToggleRight } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { useFirewallRules, useEndpoints } from '@/hooks'
 

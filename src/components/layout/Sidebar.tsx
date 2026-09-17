@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   LayoutDashboard, Shield, Monitor, Clock, Bug, Brain, Swords,
-  AlertTriangle, ShieldAlert, Usb, Network, Lock, Code,
-  Settings, Link, ChevronLeft, ChevronRight, LogOut,
-  Zap, X, UserPlus, Users, Download
+  ShieldAlert, Usb, Network, Lock, Code,
+  Settings, Link, ChevronLeft, ChevronRight,
+  Zap, UserPlus, Users, Download
 } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -70,12 +70,6 @@ const MENU_ROLE_OVERRIDES: Record<string, UserRole[]> = {
   users: ['ADMIN', 'SUPER_ADMIN'],
   onboarding: ['IT', 'ADMIN', 'SUPER_ADMIN'],
 }
-
-const ALL_ROLES: UserRole[] = [
-  'SUPER_ADMIN', 'ADMIN', 'SOC_TIER_5', 'SOC_TIER_4', 'SOC_TIER_3',
-  'SOC_TIER_2', 'SOC_TIER_1', 'AUDITOR_3', 'AUDITOR_2', 'AUDITOR_1',
-  'IT', 'ANALYST', 'VIEWER',
-]
 
 function isRoleAllowed(userRole: UserRole, allowedRoles: UserRole[]): boolean {
   return allowedRoles.includes(userRole)

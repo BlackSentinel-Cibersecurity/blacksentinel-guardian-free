@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Download, Search, Filter, Shield, Terminal, Lock, Eye, User, Clock } from 'lucide-react'
+import { FileText, Download, Search, Shield, Terminal, Lock, Eye, User, Clock } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { api } from '@/services/api'
 import type { AuditEntry } from '@/types'

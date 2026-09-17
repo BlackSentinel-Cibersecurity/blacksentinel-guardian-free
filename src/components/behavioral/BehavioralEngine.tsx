@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, AlertTriangle, Shield, TrendingUp, Activity, Users, Cpu, Network, Eye, BarChart3 } from 'lucide-react'
+import { Brain, AlertTriangle, Shield, Activity, Users, Cpu, Network, Eye } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { api } from '@/services/api'
 
@@ -30,7 +30,7 @@ interface Anomaly {
 export default function BehavioralEngine() {
   const [behavioralProfiles, setBehavioralProfiles] = useState<BehavioralProfile[]>([])
   const [anomalies, setAnomalies] = useState<Anomaly[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
   const [selectedProfile, setSelectedProfile] = useState<number | null>(null)
   const [view, setView] = useState<'profiles' | 'anomalies'>('anomalies')
 

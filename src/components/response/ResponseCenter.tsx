@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Swords, Shield, Terminal, File, RefreshCw, Download, Search, Play, Trash2, Lock, Wifi, AlertTriangle, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Shield, Terminal, RefreshCw, Download, Search, Play, Trash2, Lock, Wifi, AlertTriangle, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { useEndpoints } from '@/hooks'
 
@@ -31,7 +31,6 @@ export default function ResponseCenter() {
   const { endpoints } = useEndpoints()
   const [selectedEndpoint, setSelectedEndpoint] = useState<string>('')
   const [selectedAction, setSelectedAction] = useState<string>('')
-  const [showConfirm, setShowConfirm] = useState(false)
 
   return (
     <div className="p-6 space-y-6">

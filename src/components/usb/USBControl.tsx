@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Usb, Shield, ShieldOff, AlertTriangle, CheckCircle, Clock, Settings, Plus, Trash2 } from 'lucide-react'
+import { Usb, Shield, ShieldOff, Clock, Settings, Plus } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { useUSBDevices } from '@/hooks'
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Bug, AlertTriangle, Shield, Search, Filter, ChevronRight, ExternalLink, Terminal, Globe, File, Code, Zap } from 'lucide-react'
+import { Bug, AlertTriangle, Shield, Search, ChevronRight, Code, Zap } from 'lucide-react'
 import { cn, getSeverityBadge } from '@/utils/helpers'
 import { useThreats } from '@/hooks'
 import type { Threat } from '@/types'

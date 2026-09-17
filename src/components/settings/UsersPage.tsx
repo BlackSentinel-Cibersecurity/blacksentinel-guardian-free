@@ -68,7 +68,6 @@ export default function UsersPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.users.list()
       setUsers(data)
@@ -80,6 +79,7 @@ export default function UsersPage() {
     }
   }, [addToast])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   const filteredUsers = users.filter((u) => {

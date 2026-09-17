@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Settings, Shield, Bell, Users, Key, Globe, Database, Server, Lock, Eye, Cpu, HardDrive, RefreshCw, Download, Trash2, Plus, Copy, EyeOff, CheckCircle, XCircle, Edit, Save, X } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Settings, Shield, Bell, Users, Key, Database, Lock, Eye, Cpu, RefreshCw, Download, Trash2, Plus, Copy, EyeOff, Edit, X } from 'lucide-react'
 import { cn } from '@/utils/helpers'
 import { api } from '@/services/api'
 
@@ -62,22 +62,14 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general')
   const [showCreateUser, setShowCreateUser] = useState(false)
   const [showCreateKey, setShowCreateKey] = useState(false)
-  const [showCreateWebhook, setShowCreateWebhook] = useState(false)
-  const [editingUser, setEditingUser] = useState<number | null>(null)
+  const [, setShowCreateWebhook] = useState(false)
   const [visibleKeys, setVisibleKeys] = useState<number[]>([])
   const [users, setUsers] = useState<UserEntry[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
   const [webhooks, setWebhooks] = useState<Webhook[]>([])
   const [storageUsage, setStorageUsage] = useState<StorageItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [notificationSettings, setNotificationSettings] = useState({
-    email: { enabled: true, smtp: 'smtp.office365.com', port: '587', username: 'alerts@blacksentinel.io', password: '********', from: 'BlackSentinel Guardian <alerts@blacksentinel.io>' },
-    slack: { enabled: true, webhookUrl: 'https://hooks.slack.com/services/T00/B00/xxx', channel: '#security-alerts', username: 'Guardian Bot' },
-    teams: { enabled: true, webhookUrl: 'https://outlook.office.com/webhook/xxx', channelName: 'Security Alerts' },
-    webhook: { enabled: false, url: '', method: 'POST', headers: '{}' },
-    pagerduty: { enabled: false, integrationKey: '', serviceId: '' },
-  })
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {

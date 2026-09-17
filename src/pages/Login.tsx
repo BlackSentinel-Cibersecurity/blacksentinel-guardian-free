@@ -2,11 +2,6 @@ import { useState, useEffect } from 'react'
 import { Lock, Mail, ArrowRight, AlertTriangle, Settings } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
-const BOOTSTRAP_CREDENTIALS = {
-  email: 'setup@blacksentinel.io',
-  password: 'Guardian$etup2024!',
-}
-
 interface LoginProps {
   onLogin: () => void
   onSetupMode?: () => void

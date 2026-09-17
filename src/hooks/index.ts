@@ -15,7 +15,6 @@ export function useEndpoints() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.endpoints.list()
       setEndpoints(data)
@@ -27,6 +26,7 @@ export function useEndpoints() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { endpoints, loading, error, refresh }
@@ -38,7 +38,6 @@ export function useRegistrations() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.registrations.list()
       setRegistrations(data)
@@ -50,6 +49,7 @@ export function useRegistrations() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { registrations, loading, error, refresh }
@@ -61,7 +61,6 @@ export function useThreats() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.threats.list()
       setThreats(data)
@@ -73,6 +72,7 @@ export function useThreats() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { threats, loading, error, refresh }
@@ -84,7 +84,6 @@ export function useTimeline(endpointId?: string) {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.timeline.list({ endpointId })
       setEvents(data.data)
@@ -96,6 +95,7 @@ export function useTimeline(endpointId?: string) {
     }
   }, [endpointId])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { events, loading, error, refresh }
@@ -107,7 +107,6 @@ export function useVulnerabilities() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.vulnerabilities.list()
       setVulnerabilities(data)
@@ -119,6 +118,7 @@ export function useVulnerabilities() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { vulnerabilities, loading, error, refresh }
@@ -130,7 +130,6 @@ export function useAlerts() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.alerts.list()
       setAlerts(data)
@@ -142,6 +141,7 @@ export function useAlerts() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { alerts, loading, error, refresh }
@@ -153,7 +153,6 @@ export function useUSBDevices() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.usb.list()
       setDevices(data)
@@ -165,6 +164,7 @@ export function useUSBDevices() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { devices, loading, error, refresh }
@@ -176,7 +176,6 @@ export function useFirewallRules() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.firewall.list()
       setRules(data)
@@ -188,6 +187,7 @@ export function useFirewallRules() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { rules, loading, error, refresh }
@@ -199,7 +199,6 @@ export function useDashboardStats() {
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await api.dashboard.getStats()
       setStats(data)
@@ -211,6 +210,7 @@ export function useDashboardStats() {
     }
   }, [])
 
+  // oxlint-disable-next-line react/set-state-in-effect -- fetch-on-mount, refresh() awaits before setting state
   useEffect(() => { refresh() }, [refresh])
 
   return { stats, loading, error, refresh }
