@@ -6,7 +6,7 @@
 > and Threat Hunting modules are **not included in this repository's
 > source at all**, and the endpoint fleet is capped at 10 hosts
 > (`backend/src/config/edition.ts`). For the full platform with those
-> modules and no cap, see [blacksentinel.io](https://blacksentinel.io).
+> modules and no cap, see [blacksentinel.tech](https://blacksentinel.tech).
 
 ## Autonomous Endpoint Defense Platform
 
@@ -146,6 +146,21 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment options.
 - **Backend**: Express, Prisma, PostgreSQL, Redis
 - **Infrastructure**: Docker, Kubernetes, Nginx
 
+---
+
+## Before you run it
+
+- This is a **technical preview** and the open-source edition of the product. It comes with no warranty and no service-level commitment: try it in a test environment first.
+- It is **self-hosted**. BlackSentinel does not host it for you, and paid plans are not on sale.
+- Change every default credential and secret before exposing anything to a network. Never deploy with the example values from `.env.example` or `.env.production`.
+- Use it only on systems you own or are explicitly authorized to test or monitor. See the [Acceptable Use Policy](https://blacksentinel.tech/acceptable-use/).
+
+## Support
+
+- Bugs and questions: [open an issue](https://github.com/BlackSentinel-Cibersecurity/blacksentinel-guardian-free/issues) in this repository.
+- Security reports: follow [security.txt](https://blacksentinel.tech/.well-known/security.txt). Please do not open a public issue for a vulnerability.
+- Everything else: BlackSentinel-tech@protonmail.com
+
 ## License
 
-Proprietary - BlackSentinel Corp.
+MIT. See [LICENSE](LICENSE). The BlackSentinel name and logo are not covered by the licence.
