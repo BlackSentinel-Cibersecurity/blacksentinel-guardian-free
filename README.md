@@ -127,6 +127,18 @@ npm run build
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment options.
 
+### First sign-in
+
+There are no published default credentials. On a fresh install Guardian starts in
+setup mode: open http://localhost:3000 and enter the one-time **setup password**,
+then create your first administrator. Setup sign-in stops working once that account
+exists.
+
+The setup password is the `ADMIN_PASSWORD` that `./scripts/init-env.sh` writes to
+`backend/docker/.env` (`./scripts/deploy.sh local` runs it for you). If you start
+the stack without it, the API prints a random one once:
+`docker compose -f backend/docker/docker-compose.yml logs api`.
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |

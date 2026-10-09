@@ -1,8 +1,13 @@
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
+import { randomBytes, timingSafeEqual } from 'crypto'
 import { BOOTSTRAP_CREDENTIALS, BOOTSTRAP_CONFIG } from '../config/bootstrap.js'
 
-const BOOTSTRAP_JWT_SECRET = 'blacksentinel-bootstrap-secret-do-not-use-in-production'
+// SECURITY FIX: this was a constant in the public source, and the auth
+// middleware accepted any token it signed even after setup, so anyone could
+// mint a SUPER_ADMIN token for any install. It is now random per process, and
+// bootstrap tokens are honoured only while bootstrap mode is on.
+const BOOTSTRAP_JWT_SECRET = randomBytes(32).toString('hex')
 const BOOTSTRAP_TOKEN_EXPIRY = '1h'
 
 export interface BootstrapTokenPayload {
@@ -35,9 +40,12 @@ export function isBootstrapMode(): boolean {
 }
 
 export function validateBootstrapCredentials(email: string, password: string): boolean {
+  const given = Buffer.from(String(password))
+  const expected = Buffer.from(BOOTSTRAP_CREDENTIALS.password)
   return (
     email === BOOTSTRAP_CREDENTIALS.email &&
-    password === BOOTSTRAP_CREDENTIALS.password
+    given.length === expected.length &&
+    timingSafeEqual(given, expected)
   )
 }
 
@@ -52,6 +60,7 @@ export function generateBootstrapToken(): string {
 }
 
 export function verifyBootstrapToken(token: string): BootstrapTokenPayload | null {
+  if (!BOOTSTRAP_CONFIG.enabled) return null
   try {
     const decoded = jwt.verify(token, BOOTSTRAP_JWT_SECRET) as BootstrapTokenPayload
     if (decoded.bootstrap === true) {

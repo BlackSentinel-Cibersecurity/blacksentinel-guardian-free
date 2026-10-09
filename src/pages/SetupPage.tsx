@@ -24,10 +24,10 @@ type SetupStep = 'welcome' | 'admin' | 'database' | 'organization' | 'complete'
 
 export default function SetupPage({ onComplete }: SetupPageProps) {
   const [step, setStep] = useState<SetupStep>('welcome')
-  const [bootstrapCredentials] = useState({
-    email: 'setup@blacksentinel.io',
-    password: 'Guardian$etup2024!',
-  })
+  // The one-time setup password is ADMIN_PASSWORD from .env, or a random one
+  // the API prints once in its log on first start. It is never shipped here.
+  const setupEmail = 'setup@blacksentinel.io'
+  const [setupPassword, setSetupPassword] = useState('')
 
   const { bootstrapLogin, bootstrapComplete, isLoading } = useAuth()
 
@@ -89,7 +89,11 @@ export default function SetupPage({ onComplete }: SetupPageProps) {
 
   const handleLoginAndProceed = async () => {
     setGeneralError('')
-    const result = await bootstrapLogin(bootstrapCredentials.email, bootstrapCredentials.password)
+    if (!setupPassword.trim()) {
+      setGeneralError('Enter the setup password first')
+      return
+    }
+    const result = await bootstrapLogin(setupEmail, setupPassword.trim())
     if (result.success) {
       setStep('admin')
     } else {
@@ -204,9 +208,9 @@ export default function SetupPage({ onComplete }: SetupPageProps) {
                 <h1 className="text-xl font-bold text-bs-white">System Setup</h1>
               </div>
               <p className="text-bs-gray-mid text-sm leading-relaxed mb-6">
-                BlackSentinel Guardian is running for the first time. The system is in bootstrap
-                mode with default setup credentials active. Complete the setup wizard to create
-                your first administrator account and configure the system.
+                BlackSentinel Guardian is running for the first time. Sign in with the one-time
+                setup password, then create your first administrator account. Setup sign-in stops
+                working as soon as that account exists.
               </p>
 
               <div className="space-y-3 mb-6">
@@ -233,13 +237,27 @@ export default function SetupPage({ onComplete }: SetupPageProps) {
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-bs-yellow/5 border border-bs-yellow/20 mb-6">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-bs-yellow mt-0.5 shrink-0" />
-                  <div className="text-xs text-bs-yellow">
-                    <span className="font-medium">Default credentials active.</span>{' '}
-                    Email: {bootstrapCredentials.email} | Password: {bootstrapCredentials.password}
-                  </div>
+              <div>
+                <label htmlFor="setup-password" className="block text-sm font-medium text-bs-gray-light mb-2">
+                  Setup password
+                </label>
+                <input
+                  id="setup-password"
+                  type="password"
+                  autoComplete="one-time-code"
+                  value={setupPassword}
+                  onChange={(e) => setSetupPassword(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleLoginAndProceed() }}
+                  className="bs-input w-full"
+                  placeholder="From .env or the API log"
+                />
+                <div className="flex items-start gap-2 mt-2 text-xs text-bs-gray-mid">
+                  <AlertTriangle className="w-4 h-4 text-bs-yellow shrink-0" />
+                  <span>
+                    It is the <code>ADMIN_PASSWORD</code> in your <code>.env</code> (created by{' '}
+                    <code>./scripts/init-env.sh</code>), or the one the API printed on first start:{' '}
+                    <code>docker compose logs api</code>.
+                  </span>
                 </div>
               </div>
             </div>

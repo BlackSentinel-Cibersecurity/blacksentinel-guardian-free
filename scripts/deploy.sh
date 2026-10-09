@@ -34,6 +34,7 @@ build() {
 deploy_local() {
     echo ""
     echo "Deploying locally with Docker Compose..."
+    "$(dirname "$0")/init-env.sh"
     cd backend && $COMPOSE_CMD -f docker/docker-compose.yml up -d
     echo ""
     echo -e "${GREEN}Deployment complete!${NC}"
