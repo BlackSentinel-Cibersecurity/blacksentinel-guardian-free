@@ -18,6 +18,19 @@ import { BOOTSTRAP_CREDENTIALS } from '../config/bootstrap.js'
 const router = Router()
 const prisma = new PrismaClient()
 
+// SECURITY FIX: /bootstrap/complete and /bootstrap/test-db had no auth at all,
+// so anyone could claim a fresh install or use the API to probe internal hosts
+// and ports. Both now need the token from /bootstrap/login.
+function requireBootstrapSession(req: AuthRequest, res: Response, next: () => void) {
+  authenticateToken(req, res, () => {
+    if (!req.bootstrapUser) {
+      res.status(403).json({ error: 'Sign in with the setup password first' })
+      return
+    }
+    next()
+  })
+}
+
 const VALID_ROLES: Role[] = [
   'SUPER_ADMIN', 'ADMIN', 'SOC_TIER_1', 'SOC_TIER_2', 'SOC_TIER_3',
   'SOC_TIER_4', 'SOC_TIER_5', 'AUDITOR_1', 'AUDITOR_2', 'AUDITOR_3',
@@ -94,7 +107,7 @@ router.post('/bootstrap/login', authRateLimiter, async (req: AuthRequest, res: R
 })
 
 // POST /api/auth/bootstrap/complete - create first real user and disable bootstrap
-router.post('/bootstrap/complete', authRateLimiter, async (req: AuthRequest, res: Response) => {
+router.post('/bootstrap/complete', authRateLimiter, requireBootstrapSession, async (req: AuthRequest, res: Response) => {
   const { email, password, name, confirmPassword } = req.body
 
   if (!isBootstrapMode()) {
@@ -192,7 +205,7 @@ router.post('/bootstrap/complete', authRateLimiter, async (req: AuthRequest, res
 })
 
 // POST /api/auth/bootstrap/test-db - test database connection
-router.post('/bootstrap/test-db', async (_req: AuthRequest, res: Response) => {
+router.post('/bootstrap/test-db', authRateLimiter, requireBootstrapSession, async (_req: AuthRequest, res: Response) => {
   const { host, port, database, user, password } = _req.body
 
   if (!host || !port || !database || !user || !password) {

@@ -7,7 +7,7 @@ import { WebSocketServer, WebSocket } from 'ws'
 import { createServer } from 'http'
 import { PrismaClient } from '@prisma/client'
 import { config } from './config/index.js'
-import { BOOTSTRAP_CONFIG } from './config/bootstrap.js'
+import { BOOTSTRAP_CONFIG, BOOTSTRAP_CREDENTIALS } from './config/bootstrap.js'
 import { authRouter } from './routes/auth.js'
 import { usersRouter } from './routes/users.js'
 import { endpointsRouter } from './routes/endpoints.js'
@@ -145,7 +145,9 @@ async function checkBootstrapMode() {
     if (count === 0) {
       enableBootstrapMode()
       console.log('[BOOTSTRAP] Database connected but no users found. Bootstrap mode ENABLED.')
-      console.log('[BOOTSTRAP] Default credentials: setup@blacksentinel.io / Guardian$etup2024!')
+      console.log(BOOTSTRAP_CREDENTIALS.fromEnv
+        ? `[BOOTSTRAP] Setup sign-in: ${BOOTSTRAP_CREDENTIALS.email} with ADMIN_PASSWORD from .env`
+        : `[BOOTSTRAP] Setup sign-in: ${BOOTSTRAP_CREDENTIALS.email} / ${BOOTSTRAP_CREDENTIALS.password}  <- one-time, until the first admin exists`)
     } else {
       disableBootstrapMode()
       console.log(`[BOOTSTRAP] Database connected with ${count} user(s). Bootstrap mode DISABLED.`)
@@ -153,7 +155,9 @@ async function checkBootstrapMode() {
   } catch (err) {
     enableBootstrapMode()
     console.log('[BOOTSTRAP] Database not reachable. Bootstrap mode ENABLED.')
-    console.log('[BOOTSTRAP] Default credentials: setup@blacksentinel.io / Guardian$etup2024!')
+    console.log(BOOTSTRAP_CREDENTIALS.fromEnv
+      ? `[BOOTSTRAP] Setup sign-in: ${BOOTSTRAP_CREDENTIALS.email} with ADMIN_PASSWORD from .env`
+      : `[BOOTSTRAP] Setup sign-in: ${BOOTSTRAP_CREDENTIALS.email} / ${BOOTSTRAP_CREDENTIALS.password}  <- one-time, until the first admin exists`)
   }
 }
 
