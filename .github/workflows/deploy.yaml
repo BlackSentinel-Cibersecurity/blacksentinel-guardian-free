@@ -83,7 +83,7 @@ jobs:
   deploy:
     needs: [build-frontend, build-backend]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     environment: production
     steps:
       - uses: actions/checkout@v4
