@@ -3,11 +3,6 @@ import type { User, LoginResponse } from '@/types'
 import { api } from '@/services/api'
 import { useAppStore } from '@/store'
 
-const BOOTSTRAP_CREDENTIALS = {
-  email: 'setup@blacksentinel.io',
-  password: 'Guardian$etup2024!',
-}
-
 export function useAuth() {
   const { setUser, setToken, setRefreshToken, setIsAuthenticated, setIsLoading } =
     useAppStore()
@@ -34,54 +29,9 @@ export function useAuth() {
     }
   }, [])
 
-  const handleOfflineLogin = useCallback(
-    (email: string, password: string): boolean => {
-      if (email === BOOTSTRAP_CREDENTIALS.email && password === BOOTSTRAP_CREDENTIALS.password) {
-        const bootstrapUser: User = {
-          id: 'bootstrap-setup',
-          email: BOOTSTRAP_CREDENTIALS.email,
-          name: 'System Setup',
-          role: 'SUPER_ADMIN' as User['role'],
-          mfaEnabled: false,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-        }
-        setUser(bootstrapUser)
-        const fakeToken = 'bootstrap-token-' + Date.now()
-        setToken(fakeToken)
-        localStorage.setItem('bs_token', fakeToken)
-        setIsAuthenticated(true)
-        setIsLoading(false)
-        setBootstrapMode(true)
-        return true
-      }
-
-      const offlineEmail = localStorage.getItem('bs_offline_admin_email')
-      const offlinePassword = localStorage.getItem('bs_offline_admin_password')
-      if (offlineEmail && offlinePassword && email === offlineEmail && password === offlinePassword) {
-        const savedUser = localStorage.getItem('bs_user')
-        if (savedUser) {
-          const parsed = JSON.parse(savedUser) as User
-          setUser(parsed)
-          const fakeToken = 'offline-token-' + Date.now()
-          setToken(fakeToken)
-          localStorage.setItem('bs_token', fakeToken)
-          setIsAuthenticated(true)
-          setIsLoading(false)
-          return true
-        }
-      }
-      return false
-    },
-    [setUser, setToken, setIsAuthenticated, setIsLoading]
-  )
-
   const bootstrapLogin = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
       setIsLoading(true)
-      if (handleOfflineLogin(email, password)) {
-        return { success: true }
-      }
       try {
         const data = await api.auth.bootstrapLogin(email, password)
         setUser({
@@ -103,7 +53,7 @@ export function useAuth() {
         return { success: false, error: 'Invalid credentials' }
       }
     },
-    [handleOfflineLogin, setUser, setToken, setIsAuthenticated, setIsLoading]
+    [setUser, setToken, setIsAuthenticated, setIsLoading]
   )
 
   const bootstrapComplete = useCallback(
@@ -133,28 +83,12 @@ export function useAuth() {
         setIsLoading(false)
         setBootstrapMode(false)
         return { success: true }
-      } catch {
-        // Offline fallback: save to localStorage
-        const newUser: User = {
-          id: 'user-' + Date.now(),
-          email: userData.email,
-          name: userData.name,
-          role: 'SUPER_ADMIN' as User['role'],
-          mfaEnabled: false,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-        }
-        localStorage.setItem('bs_user', JSON.stringify(newUser))
-        localStorage.setItem('bs_offline_setup', 'true')
-        localStorage.setItem('bs_offline_admin_email', userData.email)
-        localStorage.setItem('bs_offline_admin_password', userData.password)
-        setUser(newUser)
-        const fakeToken = 'offline-token-' + Date.now()
-        setToken(fakeToken)
-        localStorage.setItem('bs_token', fakeToken)
-        setIsAuthenticated(true)
+      } catch (err) {
+        // This used to fake a local "offline" admin (keeping its password in
+        // plain text in localStorage) and report success, so setup looked done
+        // while no account existed on the server. It now reports the error.
         setIsLoading(false)
-        return { success: true }
+        return { success: false, error: err instanceof Error ? err.message : 'Setup failed' }
       }
     },
     [setUser, setToken, setRefreshToken, setIsAuthenticated, setIsLoading]
@@ -188,9 +122,6 @@ export function useAuth() {
   const login = useCallback(
     async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
       setIsLoading(true)
-      if (handleOfflineLogin(email, password)) {
-        return { success: true }
-      }
       try {
         const data = await api.auth.login(email, password)
         handleAuthResponse(data)
@@ -200,7 +131,7 @@ export function useAuth() {
         return { success: false, error: 'Invalid credentials' }
       }
     },
-    [handleOfflineLogin, handleAuthResponse, setIsLoading]
+    [handleAuthResponse, setIsLoading]
   )
 
   const loginWithMfa = useCallback(
@@ -303,21 +234,8 @@ export function useAuth() {
   )
 
   useEffect(() => {
-    // Skip token validation in bootstrap/offline mode
-    if (localStorage.getItem('bs_offline_setup') === 'true') {
-      const savedUser = localStorage.getItem('bs_user')
-      if (savedUser) {
-        const parsed = JSON.parse(savedUser) as User
-        setUser(parsed)
-        const token = localStorage.getItem('bs_token')
-        if (token) {
-          setToken(token)
-        }
-        setIsAuthenticated(true)
-      }
-      setIsLoading(false)
-      return
-    }
+    // Drop anything the removed offline mode left behind.
+    for (const k of ['bs_offline_setup', 'bs_offline_admin_email', 'bs_offline_admin_password']) localStorage.removeItem(k)
 
     const token = localStorage.getItem('bs_token')
     if (token && !token.startsWith('bootstrap-') && !token.startsWith('offline-')) {

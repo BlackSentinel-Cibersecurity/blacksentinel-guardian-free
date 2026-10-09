@@ -20,7 +20,10 @@ import type {
   EndpointRegistration,
 } from '@/types'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// Same origin by default: nginx in the frontend image (and Vite's dev proxy)
+// forward /api and /ws to the API, so it also works behind Codespaces' or any
+// other forwarded URL. Set VITE_API_URL only for a separately hosted API.
+const BASE_URL = import.meta.env.VITE_API_URL || ''
 
 let isRefreshing = false
 let failedQueue: Array<{

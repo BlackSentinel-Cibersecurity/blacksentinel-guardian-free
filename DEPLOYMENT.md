@@ -21,6 +21,7 @@ Opens at **http://localhost:5173**
 cd blacksentinel-guardian && npm ci && npm run build
 docker build -t blacksentinel/guardian-frontend -f Dockerfile.frontend .
 docker build -t blacksentinel/guardian-api ./backend
+./scripts/init-env.sh   # random JWT secrets + one-time setup password in backend/docker/.env
 cd backend && docker compose -f docker/docker-compose.yml up -d
 ```
 

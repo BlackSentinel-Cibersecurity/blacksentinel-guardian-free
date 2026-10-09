@@ -13,7 +13,11 @@ services:
       - PORT=3001
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/blacksentinel
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=${JWT_SECRET}
+      # From .env beside this file (run scripts/init-env.sh). Left empty, the API
+      # uses random JWT secrets per run and prints a one-time setup password.
+      - JWT_SECRET=${JWT_SECRET:-}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
       - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
     depends_on:
       - db
@@ -32,7 +36,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -40,7 +44,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -48,7 +52,7 @@ services:
   frontend:
     image: ghcr.io/blacksentinel-cibersecurity/blacksentinel-guardian-free-frontend:latest
     build:
-      context: ../
+      context: ../../
       dockerfile: Dockerfile.frontend
     ports:
       - "3000:80"
