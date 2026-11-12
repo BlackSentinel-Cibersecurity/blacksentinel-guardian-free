@@ -11,7 +11,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/blacksentinel
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres}@db:5432/blacksentinel
       - REDIS_URL=redis://redis:6379
       # From .env beside this file (run scripts/init-env.sh). Left empty, the API
       # uses random JWT secrets per run and prints a one-time setup password.
@@ -34,7 +34,7 @@ services:
     environment:
       POSTGRES_DB: blacksentinel
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:

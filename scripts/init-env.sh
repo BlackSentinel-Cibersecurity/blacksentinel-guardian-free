@@ -14,7 +14,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$ROOT/backend/docker/.env"
 EXAMPLE="$ROOT/backend/.env.example"
 # KEY:bytes — each becomes 2×bytes hex characters.
-KEYS=(JWT_SECRET:32 JWT_REFRESH_SECRET:32 ADMIN_PASSWORD:12)
+KEYS=(JWT_SECRET:32 JWT_REFRESH_SECRET:32 ADMIN_PASSWORD:12 DB_PASSWORD:24)
 
 rand_hex() {
   if command -v openssl >/dev/null 2>&1; then openssl rand -hex "$1"
